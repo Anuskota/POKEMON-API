@@ -20,10 +20,10 @@ const colors = {
 };
 
 async function getData(id) {
-    let data = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}/`); //Aqui estoy haciendo una llamada a la APi
+    let data = await fetch(`https://pokeapi.co/api/v2/pokemon/{id}`); //Aqui estoy haciendo una llamada a la APi
 
     let response = await data.json(); //Espero respuesta en formato json
-    let imagePokemon = response.sprites.other['official-artwork'].front_default;
+    let imagePokemon = response.sprites.front_default;
     let idPokemon = response.id;
     let namePokemon = response.name;
     let typePokemon = response.types[0].type.name;
