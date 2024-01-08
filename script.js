@@ -1,6 +1,6 @@
 const pokeCardsContainer = document.getElementById("poke-container");
 const pokemon_count = 150;
-const load = document.getElementById("load")
+
 
 const colors = {
   fire: "#FDDFDF",
@@ -19,60 +19,44 @@ const colors = {
   normal: "#F5F5F5",
 };
 
-async function getData(id) {
-    let data = await fetch(`https://pokeapi.co/api/v2/pokemon/{id}`); //Aqui estoy haciendo una llamada a la APi
+function createPokemonCard(id) {
 
-    let response = await data.json(); //Espero respuesta en formato json
-    let imagePokemon = response.sprites.front_default;
-    let idPokemon = response.id;
-    let namePokemon = response.name;
-    let typePokemon = response.types[0].type.name;
 
-    return { imagePokemon, idPokemon, namePokemon, typePokemon };
-}
+    fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+        .then(response => response.json())
+        .then(data => {
+            const pokeName = data.name;
+            const pokeId = data.id;
+            const pokeImg = data.sprites.front_default;
+            const pokeType = data.type;
+            console.log(data)
 
-//Funcion para tener el Background
+            const pokeCard = document.createElement('div');
+            pokeCard.classList.add('pokemon');
 
-function getBackgroundPOke(type) {
-    return type in colors ? colors[type] : "No exite el color"
+            const pokeColor = colors[pokeType];
+            pokeCard.style.backgroundColor = pokeColor;
 
-}
 
-//Creo el pokemon
+            pokeCard.innerHTML = `
+             <div class="pokemon" style="background-color:${pokeColor}"> 
+                <div class="img-container">
+                    <img src= "${pokeImg}" alt ="${pokeName}"> 
+                </div>   
+                <div class="info">
+                    <span class ="number">${pokeId.toString().padStart(3, '0')}</span>
+                    <h3 class"name">${pokeName}</h3>
+                    <small class ="type>Type:<span> ${pokeType} </span> >/small>
+                </div>
+            </div
+            `;
 
-function createPokemon(imagePokemon, idPokemon, namePokemon, typePokemon) {
-    let background = getBackgroundPOke(typePokemon);
-    let formattedNumber = String(idPokemon).padStart(3, "0");
+            pokeCardsContainer.appendChild(pokeCard);
+        })
 
-    const contentCard = `
-    <div class="pokemon style="background-color: ${background};">
-        <div class ="img-container">
-            <img src="${imagePokemon}" alt=${namePokemon};
-        </div>
-        <div class = "info">
-            <span class = "number">${formattedNumber}</span>
-            <h1 class="name">${namePokemon}</h1>
-            <small class="type">Type : <span>${typePokemon}</span></small>
-        </div>
-    </div>
-    `;
-
-    pokeCardsContainer.innerHTML += contentCard
+    .catch (error => console.error(error));
 
 }
-
-async function fetchAndCreatePokemon() {
-    const promises = [];
-    for (let i = 1; i <= pokemon_count; i++){
-        promises.push(getData(i));
-    }
-    const pokemonDataArray = await Promise.all(promises);
-    pokemonDataArray.sort((a, b) => a.idPokemon - b.idPokemon);
-    pokemonDataArray.forEach(({ namePokemon, imagePokemon, idPokemon, typePokemon }) => {
-        createPokemon(namePokemon, imagePokemon, idPokemon, typePokemon);
-    });
-    load.style.display="none"
+for (let i = 1; i <= pokemon_count; i++){
+    createPokemonCard(i);
 }
-fetchAndCreatePokemon();   
-
-
